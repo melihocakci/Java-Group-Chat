@@ -1,6 +1,5 @@
-package main;
+package server;
 
-import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -11,16 +10,17 @@ public class Server {
     public Server(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
     }
-    
+
     public static void main(String[] args) {
-    	try {
-    		ServerSocket serverSocket = new ServerSocket(8080);
+        try {
+            ServerSocket serverSocket = new ServerSocket(8080);
             Server server = new Server(serverSocket);
+            System.out.println("Server is online");
             server.startServer();
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    	}
-        
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
     }
 
     public void startServer() {
@@ -38,9 +38,9 @@ public class Server {
 
     public void closeServer() {
         try {
-        	serverSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            serverSocket.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 

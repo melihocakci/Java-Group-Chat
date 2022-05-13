@@ -1,4 +1,4 @@
-package main;
+package server;
 
 import java.io.*;
 import java.net.Socket;
@@ -7,7 +7,6 @@ import java.util.ArrayList;
 public class ClientHandler implements Runnable {
 
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
-
     private Socket clientSocket;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
@@ -20,7 +19,7 @@ public class ClientHandler implements Runnable {
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             clientUsername = bufferedReader.readLine();
             clientHandlers.add(this);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             closeSocket();
         }
     }
@@ -31,15 +30,15 @@ public class ClientHandler implements Runnable {
         while (clientSocket.isConnected()) {
             try {
                 messageFromClient = bufferedReader.readLine();
-                broadcastMessage(messageFromClient);
-            } catch (IOException ex) {
+                broadcast(messageFromClient);
+            } catch (Exception ex) {
                 closeSocket();
                 return;
             }
         }
     }
 
-    public void broadcastMessage(String message) {
+    public void broadcast(String message) {
         for (ClientHandler clientHandler : clientHandlers) {
             try {
                 if (!clientHandler.clientUsername.equals(clientUsername)) {
@@ -47,7 +46,7 @@ public class ClientHandler implements Runnable {
                     clientHandler.bufferedWriter.newLine();
                     clientHandler.bufferedWriter.flush();
                 }
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 closeSocket();
             }
         }
@@ -59,7 +58,7 @@ public class ClientHandler implements Runnable {
             bufferedReader.close();
             bufferedWriter.close();
             clientSocket.close();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
