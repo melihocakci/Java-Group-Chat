@@ -8,18 +8,18 @@ public class ClientHandler implements Runnable {
 
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
     private Socket clientSocket;
-    private BufferedReader bufferedReader;
-    private BufferedWriter bufferedWriter;
+    private BufferedReader socketReader;
+    private BufferedWriter socketWriter;
     private String clientUsername;
 
     public ClientHandler(Socket clientSocket) {
         try {
             this.clientSocket = clientSocket;
-            bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-            clientUsername = bufferedReader.readLine();
+            socketReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            socketWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+            clientUsername = socketReader.readLine();
             clientHandlers.add(this);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             closeSocket();
         }
     }
@@ -29,9 +29,9 @@ public class ClientHandler implements Runnable {
         String messageFromClient;
         while (clientSocket.isConnected()) {
             try {
-                messageFromClient = bufferedReader.readLine();
+                messageFromClient = socketReader.readLine();
                 broadcast(messageFromClient);
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 closeSocket();
                 return;
             }
@@ -42,11 +42,11 @@ public class ClientHandler implements Runnable {
         for (ClientHandler clientHandler : clientHandlers) {
             try {
                 if (!clientHandler.clientUsername.equals(clientUsername)) {
-                    clientHandler.bufferedWriter.write(message);
-                    clientHandler.bufferedWriter.newLine();
-                    clientHandler.bufferedWriter.flush();
+                    clientHandler.socketWriter.write(message);
+                    clientHandler.socketWriter.newLine();
+                    clientHandler.socketWriter.flush();
                 }
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 closeSocket();
             }
         }
@@ -55,11 +55,12 @@ public class ClientHandler implements Runnable {
     public void closeSocket() {
         clientHandlers.remove(this);
         try {
-            bufferedReader.close();
-            bufferedWriter.close();
+            socketReader.close();
+            socketWriter.close();
             clientSocket.close();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
+
 }

@@ -1,46 +1,30 @@
 package server;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
 
-    private final ServerSocket serverSocket;
+    private static ServerSocket serverSocket;
 
-    public Server(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
+    public static void main(String[] args) throws IOException {
+        int port = Integer.parseInt(args[0]);
+        serverSocket = new ServerSocket(port);
+        System.out.println("Server is listening on port " + port);
+        startServer();
     }
 
-    public static void main(String[] args) {
-        try {
-            ServerSocket serverSocket = new ServerSocket(8080);
-            Server server = new Server(serverSocket);
-            System.out.println("Server is online");
-            server.startServer();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-    }
-
-    public void startServer() {
-        try {
-            while (!serverSocket.isClosed()) {
+    private static void startServer() throws IOException {
+        while (!serverSocket.isClosed()) {
+            try {
                 Socket clientSocket = serverSocket.accept();
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 Thread thread = new Thread(clientHandler);
                 thread.start();
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
             }
-        } catch (Exception ex) {
-            closeServer();
-        }
-    }
-
-    public void closeServer() {
-        try {
-            serverSocket.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 
