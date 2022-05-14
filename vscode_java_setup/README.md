@@ -6,13 +6,12 @@
 
 <p>We can use following;</p>
 
-[Link to ssh key generation and addition] (https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+[Link to ssh key generation and addition](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 ## Cloning and ssh agent activation
     git clone git@github.com:melihocakci/Java-Group-Chat.git
-after cloning repo, we need to instantiate ssh agent with following commands
     Get-Service -Name ssh-agent | Set-Service -StartupType Manual
     ssh-agent
     ssh-add
     git config --global core.sshCommand C:/Windows/System32/OpenSSH/ssh.exe
     code .
-your github account is now syn with vscode.
+your github account is now sync with vscode.
