@@ -4,7 +4,8 @@
 ## Git version system installation for windows
 **When we have use git as version constrol system vscode we need to clone private repository in order to avoid clone reository issue,**
 
-<p>We can use following;
+<p>We can use following;</p>
+
 [Link to ssh key generation and addition] (https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 ## Cloning and ssh agent activation
     git clone git@github.com:melihocakci/Java-Group-Chat.git
