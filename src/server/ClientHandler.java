@@ -4,61 +4,61 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import packet.Packet;
+
 public class ClientHandler implements Runnable {
 
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
     private Socket clientSocket;
-    private BufferedReader socketReader;
-    private BufferedWriter socketWriter;
+    private ObjectInputStream inStream;
+    private ObjectOutputStream outStream;
     private String clientUsername;
 
     public ClientHandler(Socket clientSocket) {
         try {
             this.clientSocket = clientSocket;
-            socketReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            socketWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-            clientUsername = socketReader.readLine();
+            inStream = new ObjectInputStream(clientSocket.getInputStream());
+            outStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            Packet packet = (Packet) inStream.readObject();
+            clientUsername = packet.username;
             clientHandlers.add(this);
-        } catch (IOException ex) {
-            closeSocket();
+        } catch (Exception ex) {
+            closeHandler();
         }
     }
 
     @Override
     public void run() {
-        String messageFromClient;
-        while (clientSocket.isConnected()) {
-            try {
-                messageFromClient = socketReader.readLine();
-                broadcast(messageFromClient);
-            } catch (IOException ex) {
-                closeSocket();
-                return;
-            }
+    	try {
+    		while (clientSocket.isConnected()) { 
+                Packet packet = (Packet) inStream.readObject();
+                broadcast(packet);
+            } 
+        } catch (Exception ex) {
+            closeHandler();
         }
     }
 
-    public void broadcast(String message) {
-        for (ClientHandler clientHandler : clientHandlers) {
-            try {
+    public void broadcast(Packet packet) {
+    	try {
+    		for (ClientHandler clientHandler : clientHandlers) {
                 if (!clientHandler.clientUsername.equals(clientUsername)) {
-                    clientHandler.socketWriter.write(message);
-                    clientHandler.socketWriter.newLine();
-                    clientHandler.socketWriter.flush();
+                	clientHandler.outStream.writeObject(packet);
+                	clientHandler.outStream.flush();
                 }
-            } catch (IOException ex) {
-                closeSocket();
-            }
+            } 
+        } catch (Exception ex) {
+            closeHandler();
         }
     }
 
-    public void closeSocket() {
+    public void closeHandler() {
         clientHandlers.remove(this);
         try {
-            socketReader.close();
-            socketWriter.close();
+            inStream.close();
+            outStream.close();
             clientSocket.close();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

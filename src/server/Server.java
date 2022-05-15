@@ -16,15 +16,15 @@ public class Server {
     }
 
     private static void startServer() throws IOException {
-        while (!serverSocket.isClosed()) {
-            try {
+    	try {
+    		while (!serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept();
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 Thread thread = new Thread(clientHandler);
                 thread.start();
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
-            }
+            } 
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
