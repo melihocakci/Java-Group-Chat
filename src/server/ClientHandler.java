@@ -19,9 +19,6 @@ public class ClientHandler implements Runnable {
             this.clientSocket = clientSocket;
             inStream = new ObjectInputStream(clientSocket.getInputStream());
             outStream = new ObjectOutputStream(clientSocket.getOutputStream());
-            Packet packet = (Packet) inStream.readObject();
-            clientUsername = packet.username;
-            clientHandlers.add(this);
         } catch (Exception ex) {
             closeHandler();
         }
@@ -30,8 +27,11 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
     	try {
+    		Packet packet = (Packet) inStream.readObject();
+            clientUsername = packet.username;
+            clientHandlers.add(this);
     		while (clientSocket.isConnected()) { 
-                Packet packet = (Packet) inStream.readObject();
+                packet = (Packet) inStream.readObject();
                 broadcast(packet);
             } 
         } catch (Exception ex) {
